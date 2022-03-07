@@ -10,12 +10,12 @@ import config_dash
 FORMAT = 0
 URL_LIST = list()
 # Dictionary to convert size to bits
-SIZE_DICT = {'bits':   1,
-             'Kbits':  1024,
-             'Mbits':  1024*1024,
-             'bytes':  8,
-             'KB':  1024*8,
-             'MB': 1024*1024*8,
+SIZE_DICT = {'bits': 1,
+             'Kbits': 1024,
+             'Mbits': 1024 * 1024,
+             'bytes': 8,
+             'KB': 1024 * 8,
+             'MB': 1024 * 1024 * 8,
              }
 # Try to import the C implementation of ElementTree which is faster
 # In case of ImportError import the pure Python implementation
@@ -34,7 +34,7 @@ def get_tag_name(xml_element):
              Return: SegmentTemplate
     """
     try:
-        tag_name = xml_element[xml_element.find('}')+1:]
+        tag_name = xml_element[xml_element.find('}') + 1:]
     except TypeError:
         config_dash.LOG.error("Unable to retrieve the tag. ")
         return None
@@ -63,6 +63,7 @@ def get_playback_time(playback_duration):
 
 class MediaObject(object):
     """Object to handel audio and video stream """
+
     def __init__(self):
         self.min_buffer_time = None
         self.start = None
@@ -78,20 +79,20 @@ class DashPlayback:
     Audio[bandwidth] : {duration, url_list}
     Video[bandwidth] : {duration, url_list}
     """
-    def __init__(self):
 
+    def __init__(self):
         self.min_buffer_time = None
         self.playback_duration = None
         self.audio = dict()
         self.video = dict()
 
 
-def get_url_list(media, segment_duration,  playback_duration, bitrate):
+def get_url_list(media, segment_duration, playback_duration, bitrate):
     """
     Module to get the List of URLs
     """
     if FORMAT == 0:
-    # Counting the init file
+        # Counting the init file
         total_playback = segment_duration
         segment_count = media.start
         # Get the Base URL string
@@ -111,7 +112,7 @@ def get_url_list(media, segment_duration,  playback_duration, bitrate):
             total_playback += segment_duration
     elif FORMAT == 1:
         media.url_list = URL_LIST
-    #print media.url_list
+    # print media.url_list
     return media
 
 
@@ -132,20 +133,18 @@ def read_mpd(mpd_file, dashplayback):
             config_dash.JSON_HANDLE["video_metadata"]['playback_duration'] = dashplayback.playback_duration
         if MIN_BUFFER_TIME in root.attrib:
             dashplayback.min_buffer_time = get_playback_time(root.attrib[MIN_BUFFER_TIME])
-    format = 0;
+    # format = 0
     if "Period" in get_tag_name(root[0].tag):
         child_period = root[0]
         FORMAT = 0
     elif "Period" in get_tag_name(root[1].tag):
         child_period = root[1]
         FORMAT = 1
-    #print child_period
+    # print child_period
     video_segment_duration = None
     if FORMAT == 0:
         for adaptation_set in child_period:
-
             if 'mimeType' in adaptation_set.attrib:
-
                 media_found = False
                 if 'audio' in adaptation_set.attrib['mimeType']:
                     media_object = dashplayback.audio
@@ -179,11 +178,11 @@ def read_mpd(mpd_file, dashplayback):
                                         continue
                                     media_object[bandwidth].segment_sizes.append(segment_size)
                                 elif "SegmentTemplate" in get_tag_name(segment_info.tag):
-                                    video_segment_duration = (float(segment_info.attrib['duration'])/float(
+                                    video_segment_duration = (float(segment_info.attrib['duration']) / float(
                                         segment_info.attrib['timescale']))
-                                    config_dash.LOG.debug("Segment Playback Duration = {}".format(video_segment_duration))
-    elif FORMAT == 1: #differentFormat
-
+                                    config_dash.LOG.debug(
+                                        "Segment Playback Duration = {}".format(video_segment_duration))
+    elif FORMAT == 1:  # differentFormat
         for adaptation_set in child_period:
             for representation in adaptation_set:
                 media_found = False
@@ -204,10 +203,10 @@ def read_mpd(mpd_file, dashplayback):
                 media_object[bandwidth].segment_sizes = []
                 media_object[bandwidth].start = int(representation.attrib['startWithSAP'])
                 media_object[bandwidth].base_url = root[0].text
-                tempcut_url = root[0].text.split('/',3)[2:]
+                tempcut_url = root[0].text.split('/', 3)[2:]
                 cut_url = tempcut_url[1]
                 print "cut_url = {}".format(cut_url)
-                #print root[0].text
+                # print root[0].text
                 for segment_info in representation:
                     if "SegmentBase" in get_tag_name(segment_info.tag):
                         for init in segment_info:
@@ -223,22 +222,17 @@ def read_mpd(mpd_file, dashplayback):
                                         Ssize = segment_URL.attrib['media'].split('/')[0]
                                         Ssize = Ssize.split('_')[-1];
                                         Ssize = Ssize.split('kbit')[0];
-                                        #print "ssize"
-                                        #print Ssize
+                                        # print "ssize"
+                                        # print Ssize
                                         segment_size = float(Ssize) * float(
                                             SIZE_DICT["Kbits"])
                                     except KeyError, e:
                                         config_dash.LOG.error("Error in reading Segment sizes :{}".format(e))
                                         continue
                                     segurl = cut_url + segment_URL.attrib['media']
-                                    #print segurl
+                                    # print segurl
                                     URL_LIST.append(segurl)
                                     media_object[bandwidth].segment_sizes.append(segment_size)
-
-
-
     else:
-
         print "Error: UknownFormat of MPD file!"
-
     return dashplayback, int(video_segment_duration)

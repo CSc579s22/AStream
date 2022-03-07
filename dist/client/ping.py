@@ -12,7 +12,6 @@ from configure_log_file import configure_log_file
 
 """
 
-
 if not config_dash.LOG:
     configure_log_file()
 
@@ -21,10 +20,10 @@ RTT_PATTERN_LINUX = r"(\d+.\d+)/(\d+.\d+)/(\d+.\d+)/\d+.\d+ ms"
 PING_OPTION_LINUX = '-c'
 
 RTT_MATCH_WINDOWS = r"Minimum = "
-#if 'LANG' in os.environ and os.environ['LANG'] == 'FR':
+# if 'LANG' in os.environ and os.environ['LANG'] == 'FR':
 RTT_PATTERN_WINDOWS = (
     r"(\d+)ms, Maximum = (\d+)ms, (?:Moyenne|Average) = (\d+)ms")
-#else:
+# else:
 #    RTT_PATTERN_WINDOWS = (
 #        r"(\d+)ms, Maximum = (\d+)ms, Average = (\d+)ms")
 PING_OPTION_WINDOWS = '-n'

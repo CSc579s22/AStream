@@ -5,6 +5,7 @@ from time import strftime
 import io
 import json
 
+
 def configure_log_file(playback_type="", log_file=config_dash.LOG_FILENAME):
     """ Module to configure the log file and the log parameters.
     Logs are streamed to the log file as well as the screen.

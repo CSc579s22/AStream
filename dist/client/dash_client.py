@@ -38,7 +38,6 @@ try:
 except NameError:
     from shutil import WindowsError
 
-
 # Constants
 DEFAULT_PLAYBACK = 'BASIC'
 DOWNLOAD_CHUNK = 1024
@@ -57,8 +56,8 @@ class DashPlayback:
     Audio[bandwidth] : {duration, url_list}
     Video[bandwidth] : {duration, url_list}
     """
-    def __init__(self):
 
+    def __init__(self):
         self.min_buffer_time = None
         self.playback_duration = None
         self.audio = dict()
@@ -82,7 +81,7 @@ def get_mpd(url):
         message = "Unable to , file_identifierdownload MPD file HTTP Error."
         config_dash.LOG.error(message)
         return None
-    
+
     mpd_data = connection.read()
     connection.close()
     mpd_file = url.split('/')[-1]
@@ -96,7 +95,7 @@ def get_mpd(url):
 def get_bandwidth(data, duration):
     """ Module to determine the bandwidth for a segment
     download"""
-    return data * 8/duration
+    return data * 8 / duration
 
 
 def get_domain_name(url):
@@ -112,7 +111,7 @@ def id_generator(id_size=6):
     """ Module to create a random string with uppercase 
         and digits.
     """
-    return 'TEMP_' + ''.join(random.choice(ascii_letters+digits) for _ in range(id_size))
+    return 'TEMP_' + ''.join(random.choice(ascii_letters + digits) for _ in range(id_size))
 
 
 def download_segment(segment_url, dash_folder):
@@ -125,7 +124,7 @@ def download_segment(segment_url, dash_folder):
     parsed_uri = urlparse.urlparse(segment_url)
     segment_path = '{uri.path}'.format(uri=parsed_uri)
     while segment_path.startswith('/'):
-        segment_path = segment_path[1:]        
+        segment_path = segment_path[1:]
     segment_filename = os.path.join(dash_folder, os.path.basename(segment_path))
     make_sure_path_exists(os.path.dirname(segment_filename))
     segment_file_handle = open(segment_filename, 'wb')
@@ -138,8 +137,8 @@ def download_segment(segment_url, dash_folder):
             break
     connection.close()
     segment_file_handle.close()
-    #print "segment size = {}".format(segment_size)
-    #print "segment filename = {}".format(segment_filename)
+    # print "segment size = {}".format(segment_size)
+    # print "segment filename = {}".format(segment_filename)
     return segment_size, segment_filename
 
 
@@ -211,12 +210,12 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
             dp_object.video[bitrate].initialization = dp_object.video[bitrate].initialization.replace(
                 "$Bandwidth$", str(bitrate))
         media_urls = [dp_object.video[bitrate].initialization] + dp_object.video[bitrate].url_list
-        #print "media urls"
-        #print media_urls
+        # print "media urls"
+        # print media_urls
         for segment_count, segment_url in enumerate(media_urls, dp_object.video[bitrate].start):
             # segment_duration = dp_object.video[bitrate].segment_duration
-            #print "segment url"
-            #print segment_url
+            # print "segment url"
+            # print segment_url
             dp_list[segment_count][bitrate] = segment_url
     bitrates = dp_object.video.keys()
     bitrates.sort()
@@ -273,7 +272,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                                                                              weighted_mean_object.weighted_mean_rate,
                                                                              current_bitrate,
                                                                              get_segment_sizes(dp_object,
-                                                                                               segment_number+1))
+                                                                                               segment_number + 1))
                     except IndexError, e:
                         config_dash.LOG.error(e)
 
@@ -307,30 +306,30 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                 current_bitrate, average_dwn_time = basic_dash.basic_dash(segment_number, bitrates, average_dwn_time,
                                                                           segment_download_time, current_bitrate)
         segment_path = dp_list[segment][current_bitrate]
-        #print   "domain"
-        #print domain
-        #print "segment"
-        #print segment
-        #print "current bitrate"
-        #print current_bitrate
-        #print segment_path
+        # print   "domain"
+        # print domain
+        # print "segment"
+        # print segment
+        # print "current bitrate"
+        # print current_bitrate
+        # print segment_path
         segment_url = urlparse.urljoin(domain, segment_path)
-        #print "segment url"
-        #print segment_url
+        # print "segment url"
+        # print segment_url
         config_dash.LOG.info("{}: Segment URL = {}".format(playback_type.upper(), segment_url))
         if delay:
             delay_start = time.time()
-            config_dash.LOG.info("SLEEPING for {}seconds ".format(delay*segment_duration))
+            config_dash.LOG.info("SLEEPING for {}seconds ".format(delay * segment_duration))
             while time.time() - delay_start < (delay * segment_duration):
                 time.sleep(1)
             delay = 0
             config_dash.LOG.debug("SLEPT for {}seconds ".format(time.time() - delay_start))
         start_time = timeit.default_timer()
         try:
-            #print 'url'
-            #print segment_url
-            #print 'file'
-            #print file_identifier
+            # print 'url'
+            # print segment_url
+            # print 'file'
+            # print file_identifier
             segment_size, segment_filename = download_segment(segment_url, file_identifier)
             config_dash.LOG.info("{}: Downloaded segment {}".format(playback_type.upper(), segment_url))
         except IOError, e:
@@ -384,7 +383,8 @@ def get_segment_sizes(dp_object, segment_number):
     :param segment_number:
     :return:
     """
-    segment_sizes = dict([(bitrate, dp_object.video[bitrate].segment_sizes[segment_number]) for bitrate in dp_object.video])
+    segment_sizes = dict(
+        [(bitrate, dp_object.video[bitrate].segment_sizes[segment_number]) for bitrate in dp_object.video])
     config_dash.LOG.debug("The segment sizes of {} are {}".format(segment_number, segment_sizes))
     return segment_sizes
 
@@ -400,7 +400,7 @@ def get_average_segment_sizes(dp_object):
         segment_sizes = dp_object.video[bitrate].segment_sizes
         segment_sizes = [float(i) for i in segment_sizes]
         try:
-            average_segment_sizes[bitrate] = sum(segment_sizes)/len(segment_sizes)
+            average_segment_sizes[bitrate] = sum(segment_sizes) / len(segment_sizes)
         except ZeroDivisionError:
             average_segment_sizes[bitrate] = 0
     config_dash.LOG.info("The avearge segment size for is {}".format(average_segment_sizes.items()))
@@ -475,7 +475,7 @@ def start_playback_all(dp_object, domain):
 
 def create_arguments(parser):
     """ Adding arguments to the parser """
-    parser.add_argument('-m', '--MPD',                   
+    parser.add_argument('-m', '--MPD',
                         help="Url to the MPD File")
     parser.add_argument('-l', '--LIST', action='store_true',
                         help="List all the representations")
@@ -508,10 +508,10 @@ def main():
     mpd_file = get_mpd(MPD)
     domain = get_domain_name(MPD)
     dp_object = DashPlayback()
-    
+
     # Reading the MPD file created
     dp_object, video_segment_duration = read_mpd.read_mpd(mpd_file, dp_object)
-    
+
     config_dash.LOG.info("The DASH media has %d video representations" % len(dp_object.video))
     if LIST:
         # Print the representations and EXIT
@@ -533,6 +533,7 @@ def main():
     else:
         config_dash.LOG.error("Unknown Playback parameter {}".format(PLAYBACK))
         return None
+
 
 if __name__ == "__main__":
     sys.exit(main())
