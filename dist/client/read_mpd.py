@@ -220,8 +220,8 @@ def read_mpd(mpd_file, dashplayback):
                                 if "SegmentURL" in get_tag_name(segment_URL.tag):
                                     try:
                                         Ssize = segment_URL.attrib['media'].split('/')[0]
-                                        Ssize = Ssize.split('_')[-1];
-                                        Ssize = Ssize.split('kbit')[0];
+                                        Ssize = Ssize.split('_')[-1]
+                                        Ssize = Ssize.split('kbit')[0]
                                         # print "ssize"
                                         # print Ssize
                                         segment_size = float(Ssize) * float(
