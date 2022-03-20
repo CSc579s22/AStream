@@ -100,7 +100,7 @@ def get_bandwidth(data, duration):
 
 def get_domain_name(url):
     """ Module to obtain the domain name from the URL
-        From : http://stackoverflow.com/questions/9626535/get-domain-name-from-url
+        From : https://stackoverflow.com/questions/9626535/get-domain-name-from-url
     """
     parsed_uri = urlparse.urlparse(url)
     domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)

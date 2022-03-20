@@ -38,11 +38,12 @@ from argparse import ArgumentParser
 from collections import defaultdict
 from list_directory import list_directory
 import itertools
+
 # sys.path.append('..')
 
 # Default values
 DEFAULT_HOSTNAME = '198.248.242.16'
-#DEFAULT_HOSTNAME = '127.0.0.1'
+# DEFAULT_HOSTNAME = '127.0.0.1'
 DEFAULT_PORT = 8006
 DEFAULT_SLOW_RATE = 0.001
 
@@ -68,7 +69,7 @@ ACTIVE_DICT = defaultdict(dict)
 
 # DELAY Parameters
 # Number of the segement to insert delay
-#COUNT = 3
+# COUNT = 3
 SLOW_COUNT = 1000
 DELAY_VALUES = dict()
 
@@ -86,7 +87,7 @@ class MyHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Function to handle the get message"""
-        #request = self.path.strip("/").split('?')[0]
+        # request = self.path.strip("/").split('?')[0]
         request = self.path.split('?')[0]
         if request.startswith('/'):
             request = request[1:]
@@ -94,7 +95,7 @@ class MyHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         connection_id = (self.client_address[0],
                          os.path.dirname(self.path))
         shutdown = False
-        #check if the request is for the a directory
+        # check if the request is for the a directory
         if request.endswith('/'):
             dir_listing = list_directory(request)
             duration = dir_write(self.wfile, dir_listing)
@@ -103,7 +104,7 @@ class MyHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             duration = normal_write(self.wfile, request)
         elif request in MPD_FILES:
             print "Request for MPD %s" % request
-            duration = normal_write(self.wfile, request)  #, **kwargs)
+            duration = normal_write(self.wfile, request)  # , **kwargs)
             # assuming that the new session always
             # starts with the download of the MPD file
             # Making sure that older sessions are not
@@ -132,11 +133,11 @@ class MyHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             self.send_error(404)
             return
-        #self.send_response( 200 )
-        #self.send_header('ContentType', 'text/plain;charset=utf-8')
-        #self.send_header('Content-Length', str(os.path.getsize(request)))
-        #self.send_header('Pragma', 'no-cache' )
-        #self.end_headers()
+        # self.send_response( 200 )
+        # self.send_header('ContentType', 'text/plain;charset=utf-8')
+        # self.send_header('Content-Length', str(os.path.getsize(request)))
+        # self.send_header('Pragma', 'no-cache' )
+        # self.end_headers()
         if shutdown:
             self.server.shutdown()
 
@@ -236,7 +237,7 @@ def create_arguments(parser):
     parser.add_argument('-s', '--HOSTNAME', help=("Hostname of the server. Default = %s"
                                                   % DEFAULT_HOSTNAME), default=DEFAULT_HOSTNAME)
     parser.add_argument('-d', '--SLOW_RATE', type=float, help=(
-        "Delay value for the server in msec. Default = %f" % DEFAULT_SLOW_RATE),
+            "Delay value for the server in msec. Default = %f" % DEFAULT_SLOW_RATE),
                         default=DEFAULT_SLOW_RATE)
 
 
@@ -252,7 +253,7 @@ def main():
     parser = ArgumentParser(description='Process server parameters')
     create_arguments(parser)
     args = parser.parse_args()
-    #print "Len of args", len(args)
+    # print "Len of args", len(args)
     update_config(args)
     start_server()
 
