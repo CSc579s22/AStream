@@ -1,6 +1,7 @@
 #################
 ## Eclipse
 #################
+ASTREAM_LOGS/
 *.m4s
 *.csv
 *.pydevproject
