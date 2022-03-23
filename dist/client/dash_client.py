@@ -56,6 +56,7 @@ CONTROLLER = "10.10.10.11:8080"
 CLIENT_IP = None
 TITLE = None
 
+
 class DashPlayback:
     """
     Audio[bandwidth] : {duration, url_list}
@@ -151,6 +152,13 @@ def download_segment(segment_url, dash_folder):
     make_sure_path_exists(os.path.dirname(segment_filename))
     segment_file_handle = open(segment_filename, 'wb')
     segment_size = 0
+    connection_info = connection.info()
+    cache_header_x_varnish = connection_info.getheader('X-Varnish')
+    cache_header_age = connection_info.getheader('Age')
+    cache_hit = False
+    if (cache_header_age > 0) and len(cache_header_x_varnish.split(' ')) == 2:
+        cache_hit = True
+
     while True:
         segment_data = connection.read(DOWNLOAD_CHUNK)
         segment_size += len(segment_data)
@@ -161,7 +169,7 @@ def download_segment(segment_url, dash_folder):
     segment_file_handle.close()
     # print "segment size = {}".format(segment_size)
     # print "segment filename = {}".format(segment_filename)
-    return segment_size, segment_filename
+    return segment_size, segment_filename, cache_hit
 
 
 def get_media_all(domain, media_info, file_identifier, done_queue):
@@ -173,7 +181,7 @@ def get_media_all(domain, media_info, file_identifier, done_queue):
     for segment in [media.initialization] + media.url_list:
         start_time = timeit.default_timer()
         segment_url = urlparse.urljoin(domain, segment)
-        _, segment_file = download_segment(segment_url, file_identifier)
+        _, segment_file, _ = download_segment(segment_url, file_identifier)
         elapsed = timeit.default_timer() - start_time
         if segment_file:
             done_queue.put((bandwidth, segment_url, elapsed))
@@ -352,7 +360,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
             # print segment_url
             # print 'file'
             # print file_identifier
-            segment_size, segment_filename = download_segment(segment_url, file_identifier)
+            segment_size, segment_filename, cache_hit = download_segment(segment_url, file_identifier)
             config_dash.LOG.info("{}: Downloaded segment {}".format(playback_type.upper(), segment_url))
         except IOError as e:
             config_dash.LOG.error("Unable to save segment %s" % e)
@@ -365,7 +373,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         if "segment_info" not in config_dash.JSON_HANDLE:
             config_dash.JSON_HANDLE["segment_info"] = list()
         config_dash.JSON_HANDLE["segment_info"].append((segment_name, current_bitrate, segment_size,
-                                                        segment_download_time))
+                                                        segment_download_time, cache_hit))
         total_downloaded += segment_size
         config_dash.LOG.info("{} : The total downloaded = {}, segment_size = {}, segment_number = {}".format(
             playback_type.upper(),
