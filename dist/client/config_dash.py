@@ -35,12 +35,14 @@ LOG_FILENAME = os.path.join(LOG_FOLDER, 'DASH_RUNTIME_LOG')
 # Logs related to the statistics for the video
 # PLAYBACK_LOG_FILENAME = os.path.join(LOG_FOLDER, strftime('DASH_PLAYBACK_LOG_%Y-%m-%d.%H_%M_%S.csv'))
 # Buffer logs created by dash_buffer.py
-BUFFER_LOG_FILENAME = os.path.join(LOG_FOLDER, strftime('DASH_BUFFER_LOG_%Y-%m-%d.%H_%M_%S.csv'))
+# BUFFER_LOG_FILENAME = os.path.join(LOG_FOLDER, strftime('DASH_BUFFER_LOG_%Y-%m-%d.%H_%M_%S.csv'))
+BUFFER_LOG_FILENAME = ""
 LOG_FILE_HANDLE = None
 # To be set by configure_log_file.py
 LOG = None
 # JSON Filename
-JSON_LOG = os.path.join(LOG_FOLDER, strftime('ASTREAM_%Y-%m-%d.%H_%M_%S.json'))
+JSON_LOG = ""
+# JSON_LOG = os.path.join(LOG_FOLDER, strftime('ASTREAM_%Y-%m-%d.%H_%M_%S.json'))
 JSON_HANDLE = dict()
 JSON_HANDLE['playback_info'] = {'start_time': None,
                                 'end_time': None,

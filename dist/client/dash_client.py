@@ -511,7 +511,7 @@ def create_arguments(parser):
     parser.add_argument('-i', '--CLIENT_IP',
                         help="Client IP connected to OVS")
     parser.add_argument('-c', '--CONTROLLER',
-                        default="10.10.10.11:8080",
+                        default="10.10.10.1:8080",
                         help="Ryu Controller ip and port")
     # parser.add_argument('-m', '--MPD',
     #                     help="Url to the MPD File")

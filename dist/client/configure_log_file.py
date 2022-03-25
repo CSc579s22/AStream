@@ -3,6 +3,7 @@ import config_dash
 import sys
 from time import strftime
 import io
+import os
 import json
 
 
@@ -21,7 +22,9 @@ def configure_log_file(playback_type="", log_file=config_dash.LOG_FILENAME):
     config_dash.LOG.addHandler(handler1)
     # Add the handler to for the file if present
     if log_file:
-        log_filename = "_".join((log_file,playback_type, strftime('%Y-%m-%d.%H_%M_%S.log')))
+        config_dash.JSON_LOG = os.path.join(config_dash.LOG_FOLDER, "ASTREAM_{}.json".format(playback_type))
+        config_dash.BUFFER_LOG_FILENAME = os.path.join(config_dash.LOG_FOLDER, "DASH_BUFFER_LOG_{}.csv".format(playback_type))
+        log_filename = "_".join((log_file,playback_type, '.log'))
         print("Configuring log file: {}".format(log_filename))
         handler2 = logging.FileHandler(filename=log_filename)
         handler2.setFormatter(log_formatter)
