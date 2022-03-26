@@ -30,6 +30,8 @@ def configure_log_file(playback_type="", log_file=config_dash.LOG_FILENAME):
         handler2.setFormatter(log_formatter)
         config_dash.LOG.addHandler(handler2)
         print("Started logging in the log file:{}".format(log_file))
+    print("JSON_LOG: {}".format(config_dash.JSON_LOG))
+    print("BUFFER_LOG_FILENAME: {}".format(config_dash.BUFFER_LOG_FILENAME))
 
 
 def write_json(json_data=config_dash.JSON_HANDLE, json_file=config_dash.JSON_LOG):
