@@ -34,12 +34,12 @@ def configure_log_file(playback_type="", log_file=config_dash.LOG_FILENAME):
     print("BUFFER_LOG_FILENAME: {}".format(config_dash.BUFFER_LOG_FILENAME))
 
 
-def write_json(json_data=config_dash.JSON_HANDLE, json_file=config_dash.JSON_LOG):
+def write_json(json_data=config_dash.JSON_HANDLE):
     """
     :param json_data: dict
     :param json_file: json file
     :return: None
         Using utf-8 to reduce size of the file
     """
-    with io.open(json_file, 'w', encoding='utf-8') as json_file_handle:
+    with io.open(config_dash.JSON_LOG, 'w', encoding='utf-8') as json_file_handle:
         json_file_handle.write(unicode(json.dumps(json_data, ensure_ascii=False)))
