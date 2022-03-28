@@ -153,6 +153,9 @@ def download_segment(segment_url, dash_folder):
     segment_file_handle = open(segment_filename, 'wb')
     segment_size = 0
     connection_info = connection.info()
+    print(connection_info.getheader('url'))
+    real_url = connection_info.getheader('url')
+    real_bitrate = real_url.split("/")[3].split("_")[2].split("bps")[0]
     cache_header_x_varnish = connection_info.getheader('X-Varnish')
     cache_header_age = connection_info.getheader('Age')
     cache_hit = False
@@ -169,7 +172,7 @@ def download_segment(segment_url, dash_folder):
     segment_file_handle.close()
     # print "segment size = {}".format(segment_size)
     # print "segment filename = {}".format(segment_filename)
-    return segment_size, segment_filename, cache_hit
+    return segment_size, segment_filename, cache_hit, real_bitrate
 
 
 def get_media_all(domain, media_info, file_identifier, done_queue):
@@ -181,7 +184,7 @@ def get_media_all(domain, media_info, file_identifier, done_queue):
     for segment in [media.initialization] + media.url_list:
         start_time = timeit.default_timer()
         segment_url = urlparse.urljoin(domain, segment)
-        _, segment_file, _ = download_segment(segment_url, file_identifier)
+        _, segment_file, _, _= download_segment(segment_url, file_identifier)
         elapsed = timeit.default_timer() - start_time
         if segment_file:
             done_queue.put((bandwidth, segment_url, elapsed))
@@ -360,11 +363,12 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
             # print segment_url
             # print 'file'
             # print file_identifier
-            segment_size, segment_filename, cache_hit = download_segment(segment_url, file_identifier)
+            segment_size, segment_filename, cache_hit, real_bitrate = download_segment(segment_url, file_identifier)
             config_dash.LOG.info("{}: Downloaded segment {}".format(playback_type.upper(), segment_url))
         except IOError as e:
             config_dash.LOG.error("Unable to save segment %s" % e)
             return None
+        current_bitrate = real_bitrate
         segment_download_time = timeit.default_timer() - start_time
         previous_segment_times.append(segment_download_time)
         recent_download_sizes.append(segment_size)
