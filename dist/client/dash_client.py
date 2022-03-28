@@ -155,7 +155,7 @@ def download_segment(segment_url, dash_folder):
     connection_info = connection.info()
     print(connection_info.getheader('url'))
     real_url = connection_info.getheader('url')
-    real_bitrate = real_url.split("/")[3].split("_")[2].split("bps")[0]
+    real_bitrate = real_url.split("/")[3].split("_")[1].split("bps")[0]
     cache_header_x_varnish = connection_info.getheader('X-Varnish')
     cache_header_age = connection_info.getheader('Age')
     cache_hit = False
@@ -368,7 +368,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         except IOError as e:
             config_dash.LOG.error("Unable to save segment %s" % e)
             return None
-        current_bitrate = real_bitrate
         segment_download_time = timeit.default_timer() - start_time
         previous_segment_times.append(segment_download_time)
         recent_download_sizes.append(segment_size)
@@ -376,7 +375,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         segment_name = os.path.split(segment_url)[1]
         if "segment_info" not in config_dash.JSON_HANDLE:
             config_dash.JSON_HANDLE["segment_info"] = list()
-        config_dash.JSON_HANDLE["segment_info"].append((segment_name, current_bitrate, segment_size,
+        config_dash.JSON_HANDLE["segment_info"].append((segment_name, real_bitrate, segment_size,
                                                         segment_download_time, cache_hit))
         total_downloaded += segment_size
         config_dash.LOG.info("{} : The total downloaded = {}, segment_size = {}, segment_number = {}".format(
@@ -387,7 +386,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
 
         segment_info = {'playback_length': video_segment_duration,
                         'size': segment_size,
-                        'bitrate': current_bitrate,
+                        'bitrate': real_bitrate,
                         'data': segment_filename,
                         'URI': segment_url,
                         'segment_number': segment_number}
