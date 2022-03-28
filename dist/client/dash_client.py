@@ -155,7 +155,7 @@ def download_segment(segment_url, dash_folder):
     connection_info = connection.info()
     print(connection_info.getheader('url'))
     real_url = connection_info.getheader('url')
-    real_bitrate = real_url.split("/")[3].split("_")[1].split("bps")[0]
+    real_bitrate = int(real_url.split("/")[3].split("_")[1].split("bps")[0])
     cache_header_x_varnish = connection_info.getheader('X-Varnish')
     cache_header_age = connection_info.getheader('Age')
     cache_hit = False
