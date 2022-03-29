@@ -408,6 +408,15 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
     write_json()
     if not download:
         clean_files(file_identifier)
+    bye()
+
+
+def bye():
+    cache_host = MPD.split("//")[1].split("/")[0]
+    url = "http://{}/bye".format(cache_host)
+    connection = urllib2.urlopen(url, timeout=10)
+    data = json.loads(connection.read())
+    print(data)
 
 
 def get_segment_sizes(dp_object, segment_number):
